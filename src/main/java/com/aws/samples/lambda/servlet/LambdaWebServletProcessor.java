@@ -18,6 +18,9 @@ import java.util.Set;
 @SupportedAnnotationTypes("com.aws.samples.lambda.servlet.LambdaWebServlet")
 @SupportedSourceVersion(SourceVersion.RELEASE_11)
 public class LambdaWebServletProcessor extends AbstractProcessor {
+
+    public static final String ADAPTER = "Adapter";
+
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         try {
@@ -34,7 +37,7 @@ public class LambdaWebServletProcessor extends AbstractProcessor {
                     // Loop through all of the URL patterns and make a numbered adapter class for each
                     for (String urlPattern : urlPatterns) {
                         Filer filer = processingEnv.getFiler();
-                        String simpleAdapterName = element.getSimpleName() + "Adapter" + loop;
+                        String simpleAdapterName = element.getSimpleName() + ADAPTER + loop;
                         String packageName = element.getEnclosingElement().toString();
                         // Simply call the superclasses constructor with the URL pattern and a new, fully qualified instance of this class
                         String constructorStatement = "super(\"" + urlPattern + "\", new " + element.toString() + "())";
