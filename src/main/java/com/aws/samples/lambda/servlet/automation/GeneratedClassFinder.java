@@ -6,7 +6,6 @@ import io.micronaut.core.io.scan.ClassPathAnnotationScanner;
 import io.vavr.control.Try;
 
 import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -14,9 +13,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class GeneratedClassFinder {
-    public List<Class<?>> getGeneratedClassList(File jarFile, String packageName) throws MalformedURLException {
+    public List<Class<?>> getGeneratedClassList(File jarFile, String packageName) {
         URLClassLoader urlClassLoader = new URLClassLoader(
-                new URL[]{jarFile.toURI().toURL()},
+                new URL[]{Try.of(() -> jarFile.toURI().toURL()).get()},
                 this.getClass().getClassLoader()
         );
 
