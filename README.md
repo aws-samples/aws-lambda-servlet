@@ -21,10 +21,11 @@ that creates the servlet wrapper class automatically.
     def awsLambdaServlet = 'x.y.z'
     ```
 
-3. Add the annotation processor to the dependencies section
+3. Add the annotation processor and API to the dependencies section
 
     ```
     annotationProcessor "com.github.aws-samples:aws-lambda-servlet:$awsLambdaServlet"
+    api "com.github.aws-samples:aws-lambda-servlet:$awsLambdaServlet"
     ```
 
 ## Can I see an example?
