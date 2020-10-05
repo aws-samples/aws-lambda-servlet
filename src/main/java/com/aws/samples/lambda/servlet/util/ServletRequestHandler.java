@@ -83,11 +83,11 @@ public class ServletRequestHandler<T extends Servlet> implements RequestHandler<
             InMemoryHttpServletResponse response = new InMemoryHttpServletResponse();
             createFilterChain(filters).doFilter(request, response);
 
-            return new TreeMap<String, Object>(String.CASE_INSENSITIVE_ORDER) {
+            return new TreeMap<>(String.CASE_INSENSITIVE_ORDER) {
                 {
                     int code = response.getStatus();
                     put("statusCode", code < 100 ? 200 : code);
-                    TreeMap<String, String> headers = new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER) {{
+                    TreeMap<String, String> headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER) {{
                         for (String h : response.getHeaderNames()) {
                             put(h, response.getHeader(h));
                         }
@@ -135,7 +135,7 @@ public class ServletRequestHandler<T extends Servlet> implements RequestHandler<
     }
 
     protected Map<String, Object> lambdaHttpResponse(int code, String message) {
-        return new TreeMap<String, Object>(String.CASE_INSENSITIVE_ORDER) {{
+        return new TreeMap<>(String.CASE_INSENSITIVE_ORDER) {{
             put("statusCode", code);
             put("headers", new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER) {{
                 put("Content-Type", "text/plain");
