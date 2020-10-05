@@ -16,7 +16,7 @@ import java.util.Set;
 
 @AutoService(Processor.class)
 @SupportedAnnotationTypes("com.aws.samples.lambda.servlet.LambdaWebServlet")
-@SupportedSourceVersion(SourceVersion.RELEASE_11)
+@SupportedSourceVersion(SourceVersion.RELEASE_8)
 public class LambdaWebServletProcessor extends AbstractProcessor {
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
