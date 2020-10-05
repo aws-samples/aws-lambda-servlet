@@ -42,5 +42,4 @@ dependencies {
     implementation "com.squareup:javapoet:1.13.0"
 
     testImplementation "junit:junit:$junitVersion"
-    testImplementation "com.dorkbox:Annotations:3.1"
 }
