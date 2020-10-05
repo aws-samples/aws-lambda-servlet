@@ -1,0 +1,46 @@
+plugins {
+    id 'java'
+    id 'maven'
+    id 'java-library'
+    id 'application'
+    id 'idea'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+// Required for shadow JAR but we don't use it
+mainClassName = 'not-necessary'
+
+sourceCompatibility = 11
+targetCompatibility = 11
+
+def gradleDependencyVersion = '6.6.1'
+
+wrapper {
+    gradleVersion = gradleDependencyVersion
+    distributionType = Wrapper.DistributionType.ALL
+}
+
+repositories {
+    mavenCentral()
+}
+
+def awsLambdaJavaCoreVersion = '1.2.1'
+def awsLambdaJavaLog4jVersion = '1.0.0'
+def junitVersion = '4.13'
+
+dependencies {
+    annotationProcessor "com.google.auto.service:auto-service:1.0-rc7"
+    api "com.google.auto.service:auto-service-annotations:1.0-rc7"
+    api "javax.servlet:javax.servlet-api:3.1.0"
+
+    api "com.amazonaws:aws-lambda-java-core:$awsLambdaJavaCoreVersion"
+    api "com.amazonaws:aws-lambda-java-log4j:$awsLambdaJavaLog4jVersion"
+    api "org.glassfish.jersey.containers:jersey-container-servlet:2.32"
+
+    implementation "com.squareup:javapoet:1.13.0"
+
+    testImplementation "junit:junit:$junitVersion"
+    testImplementation "com.dorkbox:Annotations:3.1"
+}
