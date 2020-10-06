@@ -47,7 +47,6 @@ public class LambdaWebServletProcessor extends AbstractProcessor {
     private void generateConfigFiles() {
         Filer filer = processingEnv.getFiler();
 
-
         List<String> existingServlets = Try.of(() -> filer.getResource(StandardLocation.CLASS_OUTPUT, "", RESOURCE_FILE))
                 .mapTry(FileObject::openInputStream)
                 .map(this::readFile)

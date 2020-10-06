@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 public class GeneratedClassFinder {
     public List<GeneratedClassInfo> getGeneratedClassList() {
-        InputStream inputStream = this.getClass().getResourceAsStream(LambdaWebServletProcessor.RESOURCE_FILE);
+        InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(LambdaWebServletProcessor.RESOURCE_FILE);
 
         if (inputStream == null) {
             return new ArrayList<>();
