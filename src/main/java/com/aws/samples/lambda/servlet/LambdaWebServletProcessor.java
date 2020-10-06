@@ -52,7 +52,6 @@ public class LambdaWebServletProcessor extends AbstractProcessor {
                 .map(this::readFile)
                 .getOrElse(new ArrayList<>());
 
-        System.err.println("Existing servlets: \t" + String.join("\n\t", existingServlets));
         // Throw an exception if opening the output stream fails
         OutputStream outputStream = Try.of(() -> filer.createResource(StandardLocation.CLASS_OUTPUT, "", resourceFile))
                 .mapTry(FileObject::openOutputStream)
@@ -61,11 +60,11 @@ public class LambdaWebServletProcessor extends AbstractProcessor {
         List<String> newServlets = classToUrl.entrySet().stream()
                 .map(entry -> String.join("=", entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
-        System.err.println("New servlets: \t" + String.join("\n\t", newServlets));
 
         List<String> finalServlets = new ArrayList<>();
         finalServlets.addAll(newServlets);
         finalServlets.addAll(existingServlets);
+        finalServlets = finalServlets.stream().distinct().collect(Collectors.toList());
 
         String output = String.join("\n", finalServlets);
         Try.run(() -> outputStream.write(output.getBytes(StandardCharsets.UTF_8))).get();
