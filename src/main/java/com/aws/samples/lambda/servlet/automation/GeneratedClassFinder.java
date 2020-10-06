@@ -1,14 +1,8 @@
 package com.aws.samples.lambda.servlet.automation;
 
-import com.aws.samples.lambda.servlet.LambdaWebServlet;
 import com.aws.samples.lambda.servlet.LambdaWebServletProcessor;
-import io.micronaut.core.io.scan.ClassPathAnnotationScanner;
-import io.vavr.control.Try;
 
-import java.io.File;
 import java.io.InputStream;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
