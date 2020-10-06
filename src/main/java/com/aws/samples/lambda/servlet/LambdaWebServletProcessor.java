@@ -111,6 +111,7 @@ public class LambdaWebServletProcessor extends AbstractProcessor {
                                 .build();
                         JavaFile javaFile = JavaFile.builder(packageName, typeSpec).build();
                         javaFile.writeTo(filer);
+                        loop++;
                     }
                 }
             }
