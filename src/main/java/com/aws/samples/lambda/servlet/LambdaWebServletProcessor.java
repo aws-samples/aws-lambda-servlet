@@ -6,6 +6,7 @@ import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 import io.vavr.control.Try;
+import org.apache.log4j.Logger;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
 @SupportedAnnotationTypes("com.aws.samples.lambda.servlet.LambdaWebServlet")
 @SupportedSourceVersion(SourceVersion.RELEASE_11)
 public class LambdaWebServletProcessor extends AbstractProcessor {
+    private static final Logger log = Logger.getLogger(LambdaWebServletProcessor.class);
 
     public static final String ADAPTER = "Adapter";
 
@@ -53,6 +55,7 @@ public class LambdaWebServletProcessor extends AbstractProcessor {
                 .map(this::readFile)
                 .getOrElse(new ArrayList<>());
 
+        log.info("Existing servlets: \t" + String.join("\n\t", existingServlets));
         // Throw an exception if opening the output stream fails
         OutputStream outputStream = Try.of(() -> filer.createResource(StandardLocation.CLASS_OUTPUT, "", resourceFile))
                 .mapTry(FileObject::openOutputStream)
@@ -61,6 +64,7 @@ public class LambdaWebServletProcessor extends AbstractProcessor {
         List<String> newServlets = classToUrl.entrySet().stream()
                 .map(entry -> String.join("=", entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
+        log.info("New servlets: \t" + String.join("\n\t", newServlets));
 
         List<String> finalServlets = new ArrayList<>();
         finalServlets.addAll(newServlets);
