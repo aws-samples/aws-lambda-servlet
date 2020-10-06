@@ -14,8 +14,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 
-public abstract class StaticFileServlet extends HttpServlet {
-    private static final Logger log = Logger.getLogger(StaticFileServlet.class);
+public abstract class AbstractStaticFileServlet extends HttpServlet {
+    private static final Logger log = Logger.getLogger(AbstractStaticFileServlet.class);
 
     private Optional<MimeHelper> optionalMimeHelper = Optional.empty();
 
