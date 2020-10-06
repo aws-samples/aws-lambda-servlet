@@ -5,6 +5,7 @@ import com.google.auto.service.AutoService;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
+import io.vavr.control.Try;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
@@ -12,7 +13,13 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.servlet.annotation.WebServlet;
-import java.util.Set;
+import javax.tools.FileObject;
+import javax.tools.StandardLocation;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @AutoService(Processor.class)
 @SupportedAnnotationTypes("com.aws.samples.lambda.servlet.LambdaWebServlet")
@@ -21,8 +28,57 @@ public class LambdaWebServletProcessor extends AbstractProcessor {
 
     public static final String ADAPTER = "Adapter";
 
+    private Map<String, String> classToUrl = new HashMap<>();
+
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+        if (roundEnv.processingOver()) {
+            generateConfigFiles();
+            classToUrl = new HashMap<>();
+        } else {
+            processAnnotations(annotations, roundEnv);
+        }
+
+        return true;
+    }
+
+    // Some guidance from https://github.com/google/auto/blob/6bed859f25a8f164506b9fa7437bdbd32ccf1cd0/service/processor/src/main/java/com/google/auto/service/processor/AutoServiceProcessor.java#L162
+    private void generateConfigFiles() {
+        Filer filer = processingEnv.getFiler();
+
+        String resourceFile = "META-INF/services/" + LambdaWebServletProcessor.class.getName();
+
+        List<String> existingServlets = Try.of(() -> filer.getResource(StandardLocation.CLASS_OUTPUT, "", resourceFile))
+                .mapTry(FileObject::openInputStream)
+                .map(this::readFile)
+                .getOrElse(new ArrayList<>());
+
+        // Throw an exception if opening the output stream fails
+        OutputStream outputStream = Try.of(() -> filer.createResource(StandardLocation.CLASS_OUTPUT, "", resourceFile))
+                .mapTry(FileObject::openOutputStream)
+                .get();
+
+        List<String> newServlets = classToUrl.entrySet().stream()
+                .map(entry -> String.join("=", entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
+
+        List<String> finalServlets = new ArrayList<>();
+        finalServlets.addAll(newServlets);
+        finalServlets.addAll(existingServlets);
+
+        String output = String.join("\n", finalServlets);
+        Try.run(() -> outputStream.write(output.getBytes(StandardCharsets.UTF_8))).get();
+        Try.run(outputStream::close);
+    }
+
+    private List<String> readFile(InputStream inputStream) {
+        List<String> output = new ArrayList<>();
+        new Scanner(inputStream).forEachRemaining(output::add);
+
+        return output;
+    }
+
+    private boolean processAnnotations(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         try {
             for (TypeElement annotation : annotations) {
                 for (Element element : roundEnv.getElementsAnnotatedWith(annotation)) {
@@ -39,6 +95,8 @@ public class LambdaWebServletProcessor extends AbstractProcessor {
                         Filer filer = processingEnv.getFiler();
                         String simpleAdapterName = element.getSimpleName() + ADAPTER + loop;
                         String packageName = element.getEnclosingElement().toString();
+                        String fullAdapterName = String.join(".", packageName, simpleAdapterName);
+                        classToUrl.put(fullAdapterName, urlPattern);
                         // Simply call the superclasses constructor with the URL pattern and a new, fully qualified instance of this class
                         String constructorStatement = "super(\"" + urlPattern + "\", new " + element.toString() + "())";
                         TypeSpec typeSpec = TypeSpec
