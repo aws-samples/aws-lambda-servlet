@@ -41,7 +41,6 @@ dependencies {
     api "org.glassfish.jersey.containers:jersey-container-servlet:2.32"
 
     implementation "com.squareup:javapoet:1.13.0"
-    implementation "io.micronaut:micronaut-core:2.1.0"
     implementation "io.vavr:vavr:$vavrVersion"
 
     testImplementation "junit:junit:$junitVersion"

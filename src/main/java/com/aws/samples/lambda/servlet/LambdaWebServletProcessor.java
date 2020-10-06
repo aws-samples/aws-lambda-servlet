@@ -27,6 +27,8 @@ import java.util.stream.Collectors;
 public class LambdaWebServletProcessor extends AbstractProcessor {
     public static final String ADAPTER = "Adapter";
 
+    public static final String RESOURCE_FILE = "META-INF/services/" + LambdaWebServletProcessor.class.getName();
+
     private Map<String, String> classToUrl = new HashMap<>();
 
     @Override
@@ -45,15 +47,14 @@ public class LambdaWebServletProcessor extends AbstractProcessor {
     private void generateConfigFiles() {
         Filer filer = processingEnv.getFiler();
 
-        String resourceFile = "META-INF/services/" + LambdaWebServletProcessor.class.getName();
 
-        List<String> existingServlets = Try.of(() -> filer.getResource(StandardLocation.CLASS_OUTPUT, "", resourceFile))
+        List<String> existingServlets = Try.of(() -> filer.getResource(StandardLocation.CLASS_OUTPUT, "", RESOURCE_FILE))
                 .mapTry(FileObject::openInputStream)
                 .map(this::readFile)
                 .getOrElse(new ArrayList<>());
 
         // Throw an exception if opening the output stream fails
-        OutputStream outputStream = Try.of(() -> filer.createResource(StandardLocation.CLASS_OUTPUT, "", resourceFile))
+        OutputStream outputStream = Try.of(() -> filer.createResource(StandardLocation.CLASS_OUTPUT, "", RESOURCE_FILE))
                 .mapTry(FileObject::openOutputStream)
                 .get();
 
