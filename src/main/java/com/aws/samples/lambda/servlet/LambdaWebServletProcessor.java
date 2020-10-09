@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 public class LambdaWebServletProcessor extends AbstractProcessor {
     public static final String ADAPTER = "Adapter";
 
-    public static final String RESOURCE_FILE = "META-INF/services/" + LambdaWebServletProcessor.class.getName();
+    public static final String RESOURCE_FILE = "WEB-INF/classes/META-INF/services/" + LambdaWebServletProcessor.class.getName();
 
     private Map<String, String> classToUrl = new HashMap<>();
 
