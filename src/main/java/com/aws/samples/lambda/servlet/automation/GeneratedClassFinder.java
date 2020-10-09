@@ -13,14 +13,14 @@ import java.util.stream.Collectors;
 
 public class GeneratedClassFinder {
     public List<GeneratedClassInfo> getGeneratedClassList(JarFile jarFile) {
-        return Try.of(() -> jarFile.getJarEntry(LambdaWebServletProcessor.RESOURCE_FILE))
+        return Try.of(() -> jarFile.getJarEntry(LambdaWebServletProcessor.WAR_RESOURCE_FILE))
                 .mapTry(jarFile::getInputStream)
                 .map(this::innerGetGeneratedClassList)
                 .get();
     }
 
     private List<GeneratedClassInfo> getGeneratedClassList() {
-        return innerGetGeneratedClassList(this.getClass().getClassLoader().getResourceAsStream(LambdaWebServletProcessor.RESOURCE_FILE));
+        return innerGetGeneratedClassList(this.getClass().getClassLoader().getResourceAsStream(LambdaWebServletProcessor.WAR_RESOURCE_FILE));
     }
 
     private List<GeneratedClassInfo> innerGetGeneratedClassList(InputStream inputStream) {
