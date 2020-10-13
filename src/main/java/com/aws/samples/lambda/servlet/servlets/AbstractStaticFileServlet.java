@@ -1,22 +1,17 @@
 package com.aws.samples.lambda.servlet.servlets;
 
+import io.vavr.control.Option;
 import io.vavr.control.Try;
-import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Optional;
 
 public abstract class AbstractStaticFileServlet extends HttpServlet {
-    private static final Logger log = Logger.getLogger(AbstractStaticFileServlet.class);
-
     private Optional<MimeHelper> optionalMimeHelper = Optional.empty();
 
     @Override
@@ -32,45 +27,64 @@ public abstract class AbstractStaticFileServlet extends HttpServlet {
             requestUri = "/index.html";
         }
 
-        String filename = String.join("", getPrefix(), requestUri).replaceFirst("^/", "");
+        String baseFilename = String.join("", getPrefix(), requestUri);
 
-        URL url = Try.of(() -> this.getClass().getClassLoader().getResource(filename))
-                .onFailure(throwable -> log.error(throwable.getMessage())).get();
+        // This is the filename that AWS Lambda would use
+        String lambdaFilename = baseFilename.replaceFirst("/+", "");
 
-        if (url == null) {
+        // This is the filename that a local debug environment would use
+        String localFilename = baseFilename.replaceFirst("//", "/");
+
+        // Always try to get the AWS Lambda file first since performance counts the most there
+        Option<InputStream> inputStreamOption = Option.of(getClass().getClassLoader().getResourceAsStream(lambdaFilename));
+
+        if (inputStreamOption.isEmpty()) {
+            // Didn't find the AWS Lambda file, maybe we are debugging locally
+            inputStreamOption = Option.of(getServletContext().getResource(localFilename))
+                    .map(url -> Try.of(url::openStream).getOrNull());
+        }
+
+        if (inputStreamOption.isEmpty()) {
+            // Didn't find the file in either place
             resp.setStatus(404);
             return;
         }
 
-        URI uri = Try.of(url::toURI)
-                .onFailure(throwable -> log.error(throwable.getMessage())).get();
-        Path path = Paths.get(uri);
+        InputStream inputStream = inputStreamOption.get();
+
         Optional<String> optionalMimeType = Optional.empty();
 
-        String pathString = path.toString();
-
-        if (pathString.endsWith(".js")) {
+        if (requestUri.endsWith(".js")) {
             // For some reason the "*.nocache.js" file gets picked up by Tika as "text/x-matlab"
             optionalMimeType = Optional.of("application/javascript");
-        } else if (pathString.endsWith(".html")) {
+        } else if (requestUri.endsWith(".html")) {
             optionalMimeType = Optional.of("text/html");
-        } else if (pathString.endsWith(".png")) {
+        } else if (requestUri.endsWith(".png")) {
             optionalMimeType = Optional.of("image/png");
-        } else if (pathString.endsWith(".jpg")) {
+        } else if (requestUri.endsWith(".jpg")) {
             optionalMimeType = Optional.of("image/jpeg");
-        } else if (pathString.endsWith(".css")) {
+        } else if (requestUri.endsWith(".css")) {
             optionalMimeType = Optional.of("text/css");
         } else if (optionalMimeHelper.isPresent()) {
             // No MIME type detected, use the optional MIME helper
-            optionalMimeType = Optional.of(optionalMimeHelper.get().detect(path.toFile()));
+            optionalMimeType = Optional.of(optionalMimeHelper.get().detect(requestUri, inputStream));
         }
 
         // Only set the MIME type if we found it
         optionalMimeType.ifPresent(resp::setContentType);
-        byte[] data = Files.readAllBytes(path);
 
         resp.setStatus(200);
-        resp.getOutputStream().write(data);
+
+        // Throw an exception if the stream copy fails
+        Try.run(() -> copyStream(inputStream, resp.getOutputStream())).get();
+    }
+
+    private void copyStream(InputStream inputStream, OutputStream outputStream) throws IOException {
+        byte[] buf = new byte[8192];
+        int length;
+        while ((length = inputStream.read(buf)) > 0) {
+            outputStream.write(buf, 0, length);
+        }
     }
 
     public Optional<MimeHelper> getOptionalMimeHelper() {

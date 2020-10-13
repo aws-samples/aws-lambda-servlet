@@ -10,5 +10,5 @@ public interface MimeHelper {
 
     String detect(InputStream file);
 
-    String detect(Option<String> filename, InputStream file);
+    String detect(String filename, InputStream file);
 }
