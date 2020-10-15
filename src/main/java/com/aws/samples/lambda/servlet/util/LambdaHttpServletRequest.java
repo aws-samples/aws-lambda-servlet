@@ -148,25 +148,25 @@ public class LambdaHttpServletRequest implements HttpServletRequest {
         return isRequestedSessionIdFromURL();
     }
 
-    public boolean authenticate(HttpServletResponse response) throws IOException, ServletException {
+    public boolean authenticate(HttpServletResponse response) {
         return false;
     }
 
-    public void login(String username, String password) throws ServletException {
+    public void login(String username, String password) {
     }
 
-    public void logout() throws ServletException {
+    public void logout() {
     }
 
-    public Collection<Part> getParts() throws IOException, ServletException {
+    public Collection<Part> getParts() {
         return Collections.emptySet();
     }
 
-    public Part getPart(String name) throws IOException, ServletException {
+    public Part getPart(String name) {
         return null;
     }
 
-    public <T extends HttpUpgradeHandler> T upgrade(Class<T> handlerClass) throws IOException, ServletException {
+    public <T extends HttpUpgradeHandler> T upgrade(Class<T> handlerClass) {
         return null;
     }
 
@@ -310,14 +310,14 @@ public class LambdaHttpServletRequest implements HttpServletRequest {
         return Collections.enumeration(Collections.emptySet());
     }
 
-    public void setCharacterEncoding(String env) throws UnsupportedEncodingException {
+    public void setCharacterEncoding(String env) {
     }
 
     public long getContentLengthLong() {
         return getContentLength();
     }
 
-    public ServletInputStream getInputStream() throws IOException {
+    public ServletInputStream getInputStream() {
         return new ServletInputStream() {
 
             private final InputStream bodyStream = new ByteArrayInputStream(body.getBytes());
@@ -390,7 +390,7 @@ public class LambdaHttpServletRequest implements HttpServletRequest {
         return "HTTP/1.1";
     }
 
-    public BufferedReader getReader() throws IOException {
+    public BufferedReader getReader() {
         return new BufferedReader(new StringReader(body));
     }
 
