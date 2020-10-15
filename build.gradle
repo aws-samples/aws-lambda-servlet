@@ -27,7 +27,7 @@ repositories {
 }
 
 def awsLambdaJavaCoreVersion = '1.2.1'
-def awsLambdaJavaLog4jVersion = '1.0.0'
+def awsLambdaJavaLog4jVersion = '1.0.1'
 def vavrVersion = '0.10.3'
 def junitVersion = '4.13'
 
