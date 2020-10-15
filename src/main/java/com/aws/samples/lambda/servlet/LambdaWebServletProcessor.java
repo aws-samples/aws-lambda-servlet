@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 
 @AutoService(Processor.class)
 @SupportedAnnotationTypes("com.aws.samples.lambda.servlet.LambdaWebServlet")
-@SupportedSourceVersion(SourceVersion.RELEASE_11)
 public class LambdaWebServletProcessor extends AbstractProcessor {
     public static final String ADAPTER = "Adapter";
 

@@ -12,10 +12,10 @@ version = '0.0.1-SNAPSHOT'
 // Required for shadow JAR but we don't use it
 mainClassName = 'not-necessary'
 
-sourceCompatibility = 11
-targetCompatibility = 11
+sourceCompatibility = 8
+targetCompatibility = 8
 
-def gradleDependencyVersion = '6.6.1'
+def gradleDependencyVersion = '6.7'
 
 wrapper {
     gradleVersion = gradleDependencyVersion
