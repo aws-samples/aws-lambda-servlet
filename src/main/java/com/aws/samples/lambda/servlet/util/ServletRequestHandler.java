@@ -130,6 +130,11 @@ public class ServletRequestHandler<T extends Servlet> implements RequestHandler<
             return true;
         }
 
+        if (contentType.contains("octet")) {
+            // Octet streams are binary
+            return true;
+        }
+
         // Assume everything else isn't binary
         return false;
     }
