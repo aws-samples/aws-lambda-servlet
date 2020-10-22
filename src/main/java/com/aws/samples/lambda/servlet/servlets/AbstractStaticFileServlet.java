@@ -12,8 +12,6 @@ import java.io.OutputStream;
 import java.util.Optional;
 
 public abstract class AbstractStaticFileServlet extends HttpServlet {
-    private Optional<MimeHelper> optionalMimeHelper = Optional.empty();
-
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         // Combine the input request URI with the static asset prefix, then remove the leading slash if necessary
@@ -65,9 +63,13 @@ public abstract class AbstractStaticFileServlet extends HttpServlet {
             optionalMimeType = Optional.of("image/jpeg");
         } else if (requestUri.endsWith(".css")) {
             optionalMimeType = Optional.of("text/css");
-        } else if (optionalMimeHelper.isPresent()) {
-            // No MIME type detected, use the optional MIME helper
-            optionalMimeType = Optional.of(optionalMimeHelper.get().detect(requestUri, inputStream));
+        } else {
+            Optional<MimeHelper> optionalMimeHelper = getOptionalMimeHelper();
+
+            if (optionalMimeHelper.isPresent()) {
+                // No MIME type detected, use the optional MIME helper
+                optionalMimeType = Optional.of(optionalMimeHelper.get().detect(requestUri, inputStream));
+            }
         }
 
         // Only set the MIME type if we found it
