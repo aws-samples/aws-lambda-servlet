@@ -16,7 +16,7 @@ public class GeneratedClassFinder {
         return Try.of(() -> jarFile.getJarEntry(LambdaWebServletProcessor.RESOURCE_FILE))
                 .mapTry(jarFile::getInputStream)
                 .map(this::innerGetGeneratedClassList)
-                .get();
+                .getOrElse(ArrayList::new);
     }
 
     private List<GeneratedClassInfo> getGeneratedClassList() {
