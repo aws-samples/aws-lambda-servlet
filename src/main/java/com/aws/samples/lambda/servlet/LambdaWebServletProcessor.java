@@ -134,7 +134,7 @@ public class LambdaWebServletProcessor extends AbstractProcessor {
     private CodeBlock getReturnPermissionsCodeBlock(Element element) {
         return CodeBlock
                 .builder()
-                .beginControlFlow("if (HasIamPermissions.class.isAssignableFrom(" + element.toString() + ")")
+                .beginControlFlow("if (HasIamPermissions.class.isAssignableFrom(" + element.toString() + "))")
                 .addStatement("return new " + element.toString() + "().getPermissions()")
                 .endControlFlow()
                 .addStatement("return new ArrayList<>()")
