@@ -1,6 +1,7 @@
 package com.aws.samples.lambda.servlet;
 
 import com.aws.samples.cdk.constructs.iam.permissions.HasIamPermissions;
+import com.aws.samples.cdk.constructs.iam.permissions.IamPermission;
 import com.aws.samples.lambda.servlet.util.ServletRequestHandler;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.*;
@@ -101,10 +102,12 @@ public class LambdaWebServletProcessor extends AbstractProcessor {
                                 .addSuperinterface(HasIamPermissions.class);
 
                         typeSpecBuilder = addConstructor(typeSpecBuilder, urlPattern, element);
-                        ParameterizedTypeName parameterizedTypeName = ParameterizedTypeName.get(List.class, HasIamPermissions.class);
+
+                        ParameterizedTypeName parameterizedTypeName = ParameterizedTypeName.get(List.class, IamPermission.class);
                         typeSpecBuilder.addMethod(MethodSpec.methodBuilder("getPermissions")
                                 .returns(parameterizedTypeName)
                                 .addCode(getReturnPermissionsCodeBlock(element))
+                                .addModifiers(Modifier.PUBLIC)
                                 .build());
 
                         JavaFile javaFile = JavaFile.builder(packageName, typeSpecBuilder.build()).build();
@@ -132,12 +135,14 @@ public class LambdaWebServletProcessor extends AbstractProcessor {
     }
     
     private CodeBlock getReturnPermissionsCodeBlock(Element element) {
+        ClassName arrayList = ClassName.get("java.util", "ArrayList");
+
         return CodeBlock
                 .builder()
                 .beginControlFlow("if (HasIamPermissions.class.isAssignableFrom(" + element.toString() + "))")
                 .addStatement("return new " + element.toString() + "().getPermissions()")
                 .endControlFlow()
-                .addStatement("return new ArrayList<>()")
+                .addStatement("return new T$<>()", arrayList)
                 .build();
     }
 }
