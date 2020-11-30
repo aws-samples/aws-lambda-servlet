@@ -1,14 +1,12 @@
 package com.aws.samples.lambda.servlet;
 
+import com.aws.samples.cdk.constructs.iam.permissions.HasIamPermissions;
 import com.aws.samples.lambda.servlet.util.ServletRequestHandler;
 import com.google.auto.service.AutoService;
-import com.squareup.javapoet.JavaFile;
-import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.TypeSpec;
+import com.squareup.javapoet.*;
 import io.vavr.control.Try;
 
 import javax.annotation.processing.*;
-import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
@@ -96,19 +94,20 @@ public class LambdaWebServletProcessor extends AbstractProcessor {
                         String packageName = element.getEnclosingElement().toString();
                         String fullAdapterName = String.join(".", packageName, simpleAdapterName);
                         classToUrl.put(fullAdapterName, urlPattern);
-                        // Simply call the superclasses constructor with the URL pattern and a new, fully qualified instance of this class
-                        String constructorStatement = "super(\"" + urlPattern + "\", new " + element.toString() + "())";
-                        TypeSpec typeSpec = TypeSpec
+                        TypeSpec.Builder typeSpecBuilder = TypeSpec
                                 .classBuilder(simpleAdapterName)
                                 .addModifiers(Modifier.PUBLIC)
                                 .superclass(ServletRequestHandler.class)
-                                .addMethod(MethodSpec
-                                        .constructorBuilder()
-                                        .addModifiers(Modifier.PUBLIC)
-                                        .addStatement(constructorStatement)
-                                        .build())
-                                .build();
-                        JavaFile javaFile = JavaFile.builder(packageName, typeSpec).build();
+                                .addSuperinterface(HasIamPermissions.class);
+
+                        typeSpecBuilder = addConstructor(typeSpecBuilder, urlPattern, element);
+                        ParameterizedTypeName parameterizedTypeName = ParameterizedTypeName.get(List.class, HasIamPermissions.class);
+                        typeSpecBuilder.addMethod(MethodSpec.methodBuilder("getPermissions")
+                                .returns(parameterizedTypeName)
+                                .addCode(getReturnPermissionsCodeBlock(element))
+                                .build());
+
+                        JavaFile javaFile = JavaFile.builder(packageName, typeSpecBuilder.build()).build();
                         javaFile.writeTo(filer);
                         loop++;
                     }
@@ -120,5 +119,25 @@ public class LambdaWebServletProcessor extends AbstractProcessor {
             // We can't really deal with any kinds of failures here
             throw new RuntimeException(e);
         }
+    }
+
+    private TypeSpec.Builder addConstructor(TypeSpec.Builder typeSpecBuilder, String urlPattern, Element element) {
+        // Simply call the superclasses constructor with the URL pattern and a new, fully qualified instance of this class
+        String constructorStatement = "super(\"" + urlPattern + "\", new " + element.toString() + "())";
+        return typeSpecBuilder
+                .addMethod(MethodSpec.constructorBuilder()
+                        .addModifiers(Modifier.PUBLIC)
+                        .addStatement(constructorStatement)
+                        .build());
+    }
+    
+    private CodeBlock getReturnPermissionsCodeBlock(Element element) {
+        return CodeBlock
+                .builder()
+                .beginControlFlow("if (HasIamPermissions.class.isAssignableFrom(" + element.toString() + ")")
+                .addStatement("return new " + element.toString() + "().getPermissions()")
+                .endControlFlow()
+                .addStatement("return new ArrayList<>()")
+                .build();
     }
 }
