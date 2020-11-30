@@ -95,6 +95,7 @@ public class LambdaWebServletProcessor extends AbstractProcessor {
                         String packageName = element.getEnclosingElement().toString();
                         String fullAdapterName = String.join(".", packageName, simpleAdapterName);
                         classToUrl.put(fullAdapterName, urlPattern);
+
                         TypeSpec.Builder typeSpecBuilder = TypeSpec
                                 .classBuilder(simpleAdapterName)
                                 .addModifiers(Modifier.PUBLIC)
@@ -103,12 +104,7 @@ public class LambdaWebServletProcessor extends AbstractProcessor {
 
                         typeSpecBuilder = addConstructor(typeSpecBuilder, urlPattern, element);
 
-                        ParameterizedTypeName parameterizedTypeName = ParameterizedTypeName.get(List.class, IamPermission.class);
-                        typeSpecBuilder.addMethod(MethodSpec.methodBuilder("getPermissions")
-                                .returns(parameterizedTypeName)
-                                .addCode(getReturnPermissionsCodeBlock(element))
-                                .addModifiers(Modifier.PUBLIC)
-                                .build());
+                        typeSpecBuilder = getReturnPermissionsCodeBlock(typeSpecBuilder, element);
 
                         JavaFile javaFile = JavaFile.builder(packageName, typeSpecBuilder.build()).build();
                         javaFile.writeTo(filer);
@@ -126,23 +122,28 @@ public class LambdaWebServletProcessor extends AbstractProcessor {
 
     private TypeSpec.Builder addConstructor(TypeSpec.Builder typeSpecBuilder, String urlPattern, Element element) {
         // Simply call the superclasses constructor with the URL pattern and a new, fully qualified instance of this class
-        String constructorStatement = "super(\"" + urlPattern + "\", new " + element.toString() + "())";
         return typeSpecBuilder
                 .addMethod(MethodSpec.constructorBuilder()
                         .addModifiers(Modifier.PUBLIC)
-                        .addStatement(constructorStatement)
+                        .addStatement("super(\"" + urlPattern + "\", new $T())", element)
                         .build());
     }
-    
-    private CodeBlock getReturnPermissionsCodeBlock(Element element) {
+
+    private TypeSpec.Builder getReturnPermissionsCodeBlock(TypeSpec.Builder typeSpecBuilder, Element element) {
         ClassName arrayList = ClassName.get("java.util", "ArrayList");
 
-        return CodeBlock
-                .builder()
-                .beginControlFlow("if (HasIamPermissions.class.isAssignableFrom(" + element.toString() + "))")
-                .addStatement("return new " + element.toString() + "().getPermissions()")
-                .endControlFlow()
-                .addStatement("return new T$<>()", arrayList)
-                .build();
+        ParameterizedTypeName returnType = ParameterizedTypeName.get(List.class, IamPermission.class);
+        TypeName hasPermissionsType = TypeName.get(HasIamPermissions.class);
+
+        return typeSpecBuilder.addMethod(
+                MethodSpec.methodBuilder("getPermissions")
+                        .addModifiers(Modifier.PUBLIC)
+                        .returns(returnType)
+                        .beginControlFlow("if ($T.class.isAssignableFrom(" + element.toString() + ".class))", hasPermissionsType)
+                        .addStatement("return (($T) (new $T())).getPermissions()", hasPermissionsType, element)
+                        .nextControlFlow("else")
+                        .addStatement("return new $T<>()", arrayList)
+                        .endControlFlow()
+                        .build());
     }
 }

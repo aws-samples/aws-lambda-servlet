@@ -6,8 +6,8 @@ plugins {
     id 'idea'
 }
 
-group = 'com.example'
-version = '0.0.1-SNAPSHOT'
+group = 'local'
+version = '1.0-SNAPSHOT'
 
 // Required for shadow JAR but we don't use it
 mainClassName = 'not-necessary'
