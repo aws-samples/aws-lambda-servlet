@@ -1,12 +1,12 @@
 package com.aws.samples.lambda.servlet.automation;
 
 import com.aws.samples.lambda.servlet.LambdaWebServletProcessor;
+import io.vavr.collection.List;
 import io.vavr.control.Try;
 
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Scanner;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
@@ -16,7 +16,7 @@ public class GeneratedClassFinder {
         return Try.of(() -> jarFile.getJarEntry(LambdaWebServletProcessor.RESOURCE_FILE))
                 .mapTry(jarFile::getInputStream)
                 .map(this::innerGetGeneratedClassList)
-                .getOrElse(ArrayList::new);
+                .getOrElse(List.empty());
     }
 
     private List<GeneratedClassInfo> getGeneratedClassList() {
@@ -25,16 +25,15 @@ public class GeneratedClassFinder {
 
     private List<GeneratedClassInfo> innerGetGeneratedClassList(InputStream inputStream) {
         if (inputStream == null) {
-            return new ArrayList<>();
+            return List.empty();
         }
 
-        List<String> lines = new ArrayList<>();
+        java.util.List<String> lines = new ArrayList<>();
         new Scanner(inputStream).forEachRemaining(lines::add);
 
-        return lines.stream()
+        return List.ofAll(lines.stream()
                 .map(line -> line.split("="))
                 .map(Arrays::asList)
-                .map(value -> new GeneratedClassInfo(value.get(0), value.get(1)))
-                .collect(Collectors.toList());
+                .map(value -> new GeneratedClassInfo(value.get(0), value.get(1))));
     }
 }
