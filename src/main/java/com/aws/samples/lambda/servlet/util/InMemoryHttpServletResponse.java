@@ -105,10 +105,6 @@ public class InMemoryHttpServletResponse implements HttpServletResponse {
         doAddHeader(name, value);
     }
 
-    public void setStatus(int sc) {
-        code = sc;
-    }
-
     public void setStatus(int sc, String sm) {
         code = sc;
         messages.add(sm);
@@ -116,6 +112,10 @@ public class InMemoryHttpServletResponse implements HttpServletResponse {
 
     public int getStatus() {
         return code;
+    }
+
+    public void setStatus(int sc) {
+        code = sc;
     }
 
     public String getHeader(String name) {
@@ -150,8 +150,16 @@ public class InMemoryHttpServletResponse implements HttpServletResponse {
         return encoding;
     }
 
+    public void setCharacterEncoding(String charset) {
+        this.encoding = charset;
+    }
+
     public String getContentType() {
         return getHeader("Content-Type");
+    }
+
+    public void setContentType(String type) {
+        doSetHeader("Content-Type", type);
     }
 
     public ServletOutputStream getOutputStream() throws IOException {
@@ -188,10 +196,6 @@ public class InMemoryHttpServletResponse implements HttpServletResponse {
         return new PrintWriter(new OutputStreamWriter(getOutputStream(), getCharacterEncoding()));
     }
 
-    public void setCharacterEncoding(String charset) {
-        this.encoding = charset;
-    }
-
     public void setContentLength(int len) {
         doSetHeader("Content-Length", len);
     }
@@ -200,16 +204,12 @@ public class InMemoryHttpServletResponse implements HttpServletResponse {
         doSetHeader("Content-Length", len);
     }
 
-    public void setContentType(String type) {
-        doSetHeader("Content-Type", type);
+    public int getBufferSize() {
+        return out.size();
     }
 
     public void setBufferSize(int size) {
         out = new ByteArrayOutputStream(size);
-    }
-
-    public int getBufferSize() {
-        return out.size();
     }
 
     public void flushBuffer() throws IOException {
@@ -228,12 +228,12 @@ public class InMemoryHttpServletResponse implements HttpServletResponse {
         resetBuffer();
     }
 
-    public void setLocale(Locale loc) {
-        this.locale = loc;
-    }
-
     public Locale getLocale() {
         return locale;
+    }
+
+    public void setLocale(Locale loc) {
+        this.locale = loc;
     }
 
     public byte[] getBytes() {

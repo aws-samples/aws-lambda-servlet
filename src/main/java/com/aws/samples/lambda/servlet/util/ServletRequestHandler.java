@@ -130,13 +130,8 @@ public class ServletRequestHandler<T extends Servlet> implements RequestHandler<
             return true;
         }
 
-        if (contentType.contains("octet")) {
-            // Octet streams are binary
-            return true;
-        }
-
-        // Assume everything else isn't binary
-        return false;
+        // Octet streams are binary, everything else is assumed to not be
+        return contentType.contains("octet");
     }
 
     protected Map<String, Object> lambdaHttpResponse(int code, String message) {

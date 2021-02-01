@@ -14,14 +14,13 @@ import java.util.stream.Collectors;
 @SuppressWarnings("unchecked")
 public class LambdaHttpServletRequest implements HttpServletRequest {
     private static final Logger log = Logger.getLogger(LambdaHttpServletRequest.class);
-
-    private Map<String, Object> input;
-    private Map<String, Object> context;
-    private Map<String, String> identity;
-    private Map<String, String> querystring;
-    private Map<String, String> header;
-    private String body;
     private final Optional<? extends SessionManager> sm;
+    private final Map<String, Object> input;
+    private final Map<String, Object> context;
+    private final Map<String, String> identity;
+    private final Map<String, String> querystring;
+    private final Map<String, String> header;
+    private String body;
 
     public LambdaHttpServletRequest(Map<String, Object> input, Optional<? extends SessionManager> sm) {
         this.sm = sm;
@@ -226,6 +225,9 @@ public class LambdaHttpServletRequest implements HttpServletRequest {
         return "UTF-8";
     }
 
+    public void setCharacterEncoding(String env) {
+    }
+
     public Locale getLocale() {
         return Locale.getDefault();
     }
@@ -308,9 +310,6 @@ public class LambdaHttpServletRequest implements HttpServletRequest {
 
     public Enumeration<String> getAttributeNames() {
         return Collections.enumeration(Collections.emptySet());
-    }
-
-    public void setCharacterEncoding(String env) {
     }
 
     public long getContentLengthLong() {

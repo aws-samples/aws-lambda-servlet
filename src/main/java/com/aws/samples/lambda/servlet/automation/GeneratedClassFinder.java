@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 import java.util.jar.JarFile;
-import java.util.stream.Collectors;
 
 public class GeneratedClassFinder {
     public List<GeneratedClassInfo> getGeneratedClassList(JarFile jarFile) {

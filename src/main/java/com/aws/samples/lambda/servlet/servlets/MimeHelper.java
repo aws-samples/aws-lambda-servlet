@@ -1,7 +1,5 @@
 package com.aws.samples.lambda.servlet.servlets;
 
-import io.vavr.control.Option;
-
 import java.io.File;
 import java.io.InputStream;
 
