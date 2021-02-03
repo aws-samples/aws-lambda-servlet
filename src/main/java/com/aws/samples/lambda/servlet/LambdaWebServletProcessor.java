@@ -5,6 +5,9 @@ import com.aws.samples.cdk.constructs.iam.permissions.IamPermission;
 import com.aws.samples.lambda.servlet.util.ServletRequestHandler;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.*;
+import io.vavr.collection.HashMap;
+import io.vavr.collection.List;
+import io.vavr.collection.Map;
 import io.vavr.control.Try;
 
 import javax.annotation.processing.*;
@@ -17,8 +20,9 @@ import javax.tools.StandardLocation;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Scanner;
+import java.util.Set;
 
 @AutoService(Processor.class)
 @SupportedAnnotationTypes("com.aws.samples.lambda.servlet.LambdaWebServlet")
@@ -27,13 +31,13 @@ public class LambdaWebServletProcessor extends AbstractProcessor {
 
     public static final String RESOURCE_FILE = "META-INF/services/" + LambdaWebServletProcessor.class.getName();
 
-    private Map<String, String> classToUrl = new HashMap<>();
+    private Map<String, String> classToUrl = HashMap.empty();
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         if (roundEnv.processingOver()) {
             generateConfigFiles();
-            classToUrl = new HashMap<>();
+            classToUrl = HashMap.empty();
         } else {
             processAnnotations(annotations, roundEnv);
         }
@@ -48,21 +52,21 @@ public class LambdaWebServletProcessor extends AbstractProcessor {
         List<String> existingServlets = Try.of(() -> filer.getResource(StandardLocation.CLASS_OUTPUT, "", RESOURCE_FILE))
                 .mapTry(FileObject::openInputStream)
                 .map(this::readFile)
-                .getOrElse(new ArrayList<>());
+                .getOrElse(List.empty());
 
         // Throw an exception if opening the output stream fails
         OutputStream outputStream = Try.of(() -> filer.createResource(StandardLocation.CLASS_OUTPUT, "", RESOURCE_FILE))
                 .mapTry(FileObject::openOutputStream)
                 .get();
 
-        List<String> newServlets = classToUrl.entrySet().stream()
-                .map(entry -> String.join("=", entry.getKey(), entry.getValue()))
-                .collect(Collectors.toList());
+        List<String> newServlets = classToUrl
+                .map(entry -> String.join("=", entry._1, entry._2))
+                .toList();
 
-        List<String> finalServlets = new ArrayList<>();
-        finalServlets.addAll(newServlets);
-        finalServlets.addAll(existingServlets);
-        finalServlets = finalServlets.stream().distinct().collect(Collectors.toList());
+        List<String> finalServlets = List
+                .ofAll(newServlets)
+                .appendAll(existingServlets)
+                .distinct();
 
         String output = String.join("\n", finalServlets);
         Try.run(() -> outputStream.write(output.getBytes(StandardCharsets.UTF_8))).get();
@@ -70,10 +74,10 @@ public class LambdaWebServletProcessor extends AbstractProcessor {
     }
 
     private List<String> readFile(InputStream inputStream) {
-        List<String> output = new ArrayList<>();
+        ArrayList<String> output = new ArrayList<>();
         new Scanner(inputStream).forEachRemaining(output::add);
 
-        return output;
+        return List.ofAll(output);
     }
 
     private boolean processAnnotations(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
