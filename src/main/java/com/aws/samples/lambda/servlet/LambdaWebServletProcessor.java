@@ -98,7 +98,7 @@ public class LambdaWebServletProcessor extends AbstractProcessor {
                         String simpleAdapterName = element.getSimpleName() + ADAPTER + loop;
                         String packageName = element.getEnclosingElement().toString();
                         String fullAdapterName = String.join(".", packageName, simpleAdapterName);
-                        classToUrl.put(fullAdapterName, urlPattern);
+                        classToUrl = classToUrl.put(fullAdapterName, urlPattern);
 
                         TypeSpec.Builder typeSpecBuilder = TypeSpec
                                 .classBuilder(simpleAdapterName)
