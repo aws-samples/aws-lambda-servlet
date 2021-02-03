@@ -130,7 +130,7 @@ public class LambdaWebServletProcessor extends AbstractProcessor {
     }
 
     private TypeSpec.Builder getReturnPermissionsCodeBlock(TypeSpec.Builder typeSpecBuilder, Element element) {
-        ClassName arrayList = ClassName.get("java.util", "ArrayList");
+        ClassName vavrList = ClassName.get("io.vavr.collection", "List");
 
         ParameterizedTypeName returnType = ParameterizedTypeName.get(List.class, IamPermission.class);
         TypeName hasPermissionsType = TypeName.get(HasIamPermissions.class);
@@ -142,7 +142,7 @@ public class LambdaWebServletProcessor extends AbstractProcessor {
                         .beginControlFlow("if ($T.class.isAssignableFrom(" + element.toString() + ".class))", hasPermissionsType)
                         .addStatement("return (($T) (new $T())).getPermissions()", hasPermissionsType, element)
                         .nextControlFlow("else")
-                        .addStatement("return new $T<>()", arrayList)
+                        .addStatement("return $T.empty()", vavrList)
                         .endControlFlow()
                         .build());
     }
