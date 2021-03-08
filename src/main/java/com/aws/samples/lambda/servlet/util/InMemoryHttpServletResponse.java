@@ -1,7 +1,5 @@
 package com.aws.samples.lambda.servlet.util;
 
-import org.apache.log4j.Logger;
-
 import javax.servlet.ServletOutputStream;
 import javax.servlet.WriteListener;
 import javax.servlet.http.Cookie;
@@ -18,7 +16,6 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings({"unchecked", "deprecation"})
 public class InMemoryHttpServletResponse implements HttpServletResponse {
-    private static final Logger log = Logger.getLogger(InMemoryHttpServletResponse.class);
     private final Collection<Cookie> cookies = new ArrayList<>();
     private final Map<String, Set<Object>> headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
     private final Set<String> errors = new HashSet<>();

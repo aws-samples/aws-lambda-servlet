@@ -1,7 +1,5 @@
 package com.aws.samples.lambda.servlet.util;
 
-import org.apache.log4j.Logger;
-
 import javax.servlet.*;
 import javax.servlet.http.*;
 import java.io.*;
@@ -13,7 +11,6 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings("unchecked")
 public class LambdaHttpServletRequest implements HttpServletRequest {
-    private static final Logger log = Logger.getLogger(LambdaHttpServletRequest.class);
     private final Optional<? extends SessionManager> sm;
     private final Map<String, Object> input;
     private final Map<String, Object> context;

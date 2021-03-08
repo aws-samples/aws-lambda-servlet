@@ -2,7 +2,8 @@ package com.aws.samples.lambda.servlet.util;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.servlet.*;
 import java.util.*;
@@ -11,8 +12,7 @@ import java.util.*;
  * Lambda handler implementation delegating the request to the given Servlet instance.
  */
 public class ServletRequestHandler<T extends Servlet> implements RequestHandler<Map<String, Object>, Object> {
-    protected final Logger log = Logger.getLogger(this.getClass());
-
+    protected final Logger log = LogManager.getLogger();
     protected final String contextPath;
     protected final T servlet;
     protected final Optional<? extends SessionManager> sm;
