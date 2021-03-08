@@ -2,8 +2,7 @@ package com.aws.samples.lambda.servlet.util;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import io.vavr.control.Try;
 
 import javax.servlet.*;
 import java.util.*;
@@ -12,7 +11,6 @@ import java.util.*;
  * Lambda handler implementation delegating the request to the given Servlet instance.
  */
 public class ServletRequestHandler<T extends Servlet> implements RequestHandler<Map<String, Object>, Object> {
-    protected final Logger log = LogManager.getLogger();
     protected final String contextPath;
     protected final T servlet;
     protected final Optional<? extends SessionManager> sm;
@@ -38,7 +36,7 @@ public class ServletRequestHandler<T extends Servlet> implements RequestHandler<
                 }
 
                 public ServletContext getServletContext() {
-                    return new DummyServletContext();
+                    return new DummyLambdaServletContext();
                 }
 
                 public String getInitParameter(String name) {
@@ -81,6 +79,11 @@ public class ServletRequestHandler<T extends Servlet> implements RequestHandler<
         try {
             LambdaHttpServletRequest request = new LambdaHttpServletRequest(removeContextPath(input), sm);
             InMemoryHttpServletResponse response = new InMemoryHttpServletResponse();
+
+            // Set the logger from the Lambda context
+            ((DummyLambdaServletContext) this.servlet.getServletConfig().getServletContext()).setLogger(context.getLogger());
+
+            // Likely we have no filters so this really just calls the function and services the request
             createFilterChain(filters).doFilter(request, response);
 
             return new TreeMap<String, Object>(String.CASE_INSENSITIVE_ORDER) {
@@ -104,9 +107,11 @@ public class ServletRequestHandler<T extends Servlet> implements RequestHandler<
                     }
                 }
             };
-        } catch (Exception e) {
-            log.error("Failed to handle the request", e);
-            return lambdaHttpResponse(500, "Internal Server Error: " + e.getMessage());
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            Try.run(() -> context.getLogger().log("Exception: " + exception.getMessage() + ", Failed to handle the request"))
+                    .orElseRun(throwable -> System.err.println("Exception 1: " + exception.getMessage() + ", Exception 2: " + throwable.getMessage()));
+            return lambdaHttpResponse(500, "Internal Server Error: " + exception.getMessage());
         }
     }
 

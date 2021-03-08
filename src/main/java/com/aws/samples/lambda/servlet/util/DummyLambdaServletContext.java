@@ -1,5 +1,8 @@
 package com.aws.samples.lambda.servlet.util;
 
+import com.amazonaws.services.lambda.runtime.LambdaLogger;
+import io.vavr.control.Option;
+
 import javax.servlet.*;
 import javax.servlet.descriptor.JspConfigDescriptor;
 import java.io.InputStream;
@@ -8,7 +11,17 @@ import java.net.URL;
 import java.util.*;
 
 @SuppressWarnings("deprecation")
-public class DummyServletContext implements ServletContext {
+public class DummyLambdaServletContext implements ServletContext {
+    private Option<LambdaLogger> lambdaLoggerOption = Option.none();
+
+    public void setLogger(LambdaLogger lambdaLogger) {
+        this.lambdaLoggerOption = Option.of(lambdaLogger);
+    }
+
+    public Option<LambdaLogger> getLogger() {
+        return lambdaLoggerOption;
+    }
+
     public String getContextPath() {
         return null;
     }
@@ -70,12 +83,25 @@ public class DummyServletContext implements ServletContext {
     }
 
     public void log(String msg) {
+        getLogger()
+                .onEmpty(() -> System.err.println(msg))
+                .forEach(logger -> logger.log(msg));
     }
 
-    public void log(Exception exception, String msg) {
+    public void log(Exception exception, String message) {
+        exception.printStackTrace();
+
+        getLogger()
+                .onEmpty(() -> System.err.println(message))
+                .forEach(logger -> logger.log("Exception: " + exception.getMessage() + ", " + message));
     }
 
     public void log(String message, Throwable throwable) {
+        throwable.printStackTrace();
+
+        getLogger()
+                .onEmpty(() -> System.err.println(message))
+                .forEach(logger -> logger.log("Throwable: " + throwable.getMessage() + ", " + message));
     }
 
     public String getRealPath(String path) {
