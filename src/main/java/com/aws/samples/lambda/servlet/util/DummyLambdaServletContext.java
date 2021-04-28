@@ -82,12 +82,14 @@ public class DummyLambdaServletContext implements ServletContext {
         return Collections.enumeration(Collections.emptySet());
     }
 
+    @Override
     public void log(String msg) {
         getLogger()
                 .onEmpty(() -> System.err.println(msg))
                 .forEach(logger -> logger.log(msg));
     }
 
+    @Override
     public void log(Exception exception, String message) {
         exception.printStackTrace();
 
@@ -96,6 +98,7 @@ public class DummyLambdaServletContext implements ServletContext {
                 .forEach(logger -> logger.log("Exception: " + exception.getMessage() + ", " + message));
     }
 
+    @Override
     public void log(String message, Throwable throwable) {
         throwable.printStackTrace();
 
