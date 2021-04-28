@@ -50,7 +50,7 @@ dependencies {
     runtimeOnly("org.apache.logging.log4j:log4j-slf4j18-impl:$log4jVersion")
     runtimeOnly("com.amazonaws:aws-lambda-java-log4j2:$awsLambdaJavaLog4j2Version")
 
-    api("org.glassfish.jersey.containers:jersey-container-servlet:2.32")
+    api("org.glassfish.jersey.containers:jersey-container-servlet:2.34")
     implementation("com.github.aws-samples:aws-cdk-constructs-for-java:$awsCdkConstructsForJavaVersion")
 
     implementation("com.squareup:javapoet:1.13.0")
