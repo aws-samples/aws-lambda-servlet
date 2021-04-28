@@ -33,7 +33,7 @@ def awsLambdaJavaLog4j2Version = '1.2.0'
 def log4jVersion = '2.13.0'
 def vavrVersion = '0.10.3'
 def junitVersion = '4.13.2'
-def awsCdkConstructsForJavaVersion = '0.1.0'
+def awsCdkConstructsForJavaVersion = '0.8.2'
 
 dependencies {
     annotationProcessor "com.google.auto.service:auto-service:1.0-rc7"
