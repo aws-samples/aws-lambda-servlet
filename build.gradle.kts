@@ -29,7 +29,7 @@ val awsLambdaJavaLog4j2Version = "1.2.0"
 val log4jVersion = "2.13.0"
 val vavrVersion = "0.10.3"
 val junitVersion = "4.13.2"
-val awsCdkConstructsForJavaVersion = "0.8.4"
+val awsCdkConstructsForJavaVersion = "0.12.0"
 
 repositories {
     mavenCentral()
