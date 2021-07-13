@@ -63,6 +63,8 @@ public abstract class AbstractStaticFileServlet extends HttpServlet {
             optionalMimeType = Optional.of("image/jpeg");
         } else if (requestUri.endsWith(".css")) {
             optionalMimeType = Optional.of("text/css");
+        } else if (requestUri.endsWith(".js.map")) {
+            optionalMimeType = Optional.of("application/json");
         } else {
             // No MIME type detected, use the optional MIME helper if possible
             String finalRequestUri = requestUri;
