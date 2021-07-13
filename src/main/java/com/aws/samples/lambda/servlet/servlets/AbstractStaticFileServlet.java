@@ -66,11 +66,12 @@ public abstract class AbstractStaticFileServlet extends HttpServlet {
         } else if (requestUri.endsWith(".js.map")) {
             optionalMimeType = Optional.of("application/json");
         } else {
-            Optional<MimeHelper> optionalMimeHelper = getOptionalMimeHelper();
-
-            if (optionalMimeHelper.isPresent()) {
-                // No MIME type detected, use the optional MIME helper
-                optionalMimeType = Optional.of(optionalMimeHelper.get().detect(requestUri, inputStream));
+            // No MIME type detected, use the optional MIME helper if possible
+            try {
+                optionalMimeType = optionalMimeHelper = getOptionalMimeHelper()
+                        .map(mimeHelper -> mimeHelper.detect(requestUri, inputStream))
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
 
