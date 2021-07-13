@@ -64,12 +64,15 @@ public abstract class AbstractStaticFileServlet extends HttpServlet {
         } else if (requestUri.endsWith(".css")) {
             optionalMimeType = Optional.of("text/css");
         } else {
-            Optional<MimeHelper> optionalMimeHelper = getOptionalMimeHelper();
+            // No MIME type detected, use the optional MIME helper if possible
+            String finalRequestUri = requestUri;
 
-            if (optionalMimeHelper.isPresent()) {
-                // No MIME type detected, use the optional MIME helper
-                optionalMimeType = Optional.of(optionalMimeHelper.get().detect(requestUri, inputStream));
-            }
+            optionalMimeType = Try.of(this::getOptionalMimeHelper)
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .map(mimeHelper -> mimeHelper.detect(finalRequestUri, inputStream))
+                    .map(Optional::of)
+                    .getOrElse(Optional::empty);
         }
 
         // Only set the MIME type if we found it
