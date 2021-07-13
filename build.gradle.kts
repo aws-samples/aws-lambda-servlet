@@ -40,7 +40,7 @@ repositories {
 
 dependencies {
     annotationProcessor("com.google.auto.service:auto-service:1.0")
-    api("com.google.auto.service:auto-service-annotations:1.0-rc7")
+    api("com.google.auto.service:auto-service-annotations:1.0")
     api("javax.servlet:javax.servlet-api:4.0.1")
 
     // Lambda core and logging
