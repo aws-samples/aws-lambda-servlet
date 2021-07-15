@@ -27,7 +27,7 @@ version = "1.0-SNAPSHOT"
 val awsLambdaJavaCoreVersion = "1.2.1"
 val awsLambdaJavaLog4j2Version = "1.2.0"
 val log4jVersion = "2.14.1"
-val vavrVersion = "0.10.3"
+val vavrVersion = "0.10.4"
 val junitVersion = "4.13.2"
 val awsCdkConstructsForJavaVersion = "0.15.6"
 
