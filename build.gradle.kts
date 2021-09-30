@@ -26,10 +26,9 @@ version = "1.0-SNAPSHOT"
 
 val awsLambdaJavaCoreVersion = "1.2.1"
 val awsLambdaJavaLog4j2Version = "1.2.0"
-val log4jVersion = "2.14.1"
 val vavrVersion = "0.10.4"
 val junitVersion = "4.13.2"
-val awsCdkConstructsForJavaVersion = "0.17.0"
+val awsCdkConstructsForJavaVersion = "0.17.9"
 
 repositories {
     mavenCentral()
@@ -45,9 +44,6 @@ dependencies {
 
     // Lambda core and logging
     implementation("com.amazonaws:aws-lambda-java-core:$awsLambdaJavaCoreVersion")
-    implementation("org.apache.logging.log4j:log4j-api:$log4jVersion")
-    implementation("org.apache.logging.log4j:log4j-core:$log4jVersion")
-    runtimeOnly("org.apache.logging.log4j:log4j-slf4j18-impl:$log4jVersion")
     runtimeOnly("com.amazonaws:aws-lambda-java-log4j2:$awsLambdaJavaLog4j2Version")
 
     api("org.glassfish.jersey.containers:jersey-container-servlet:2.35")
