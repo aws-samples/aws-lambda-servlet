@@ -46,7 +46,7 @@ dependencies {
     implementation("com.amazonaws:aws-lambda-java-core:$awsLambdaJavaCoreVersion")
     runtimeOnly("com.amazonaws:aws-lambda-java-log4j2:$awsLambdaJavaLog4j2Version")
 
-    api("org.glassfish.jersey.containers:jersey-container-servlet:2.35")
+    api("org.glassfish.jersey.containers:jersey-container-servlet:2.36")
     implementation("com.github.aws-samples:aws-cdk-constructs-for-java:$awsCdkConstructsForJavaVersion")
 
     implementation("com.squareup:javapoet:1.13.0")
