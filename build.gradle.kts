@@ -24,7 +24,7 @@ tasks.distTar { enabled = true }
 group = "local"
 version = "1.0-SNAPSHOT"
 
-val awsLambdaJavaCoreVersion = "1.2.1"
+val awsLambdaJavaCoreVersion = "1.2.2"
 val awsLambdaJavaLog4j2Version = "1.2.0"
 val vavrVersion = "0.10.4"
 val junitVersion = "4.13.2"
